@@ -1,0 +1,36 @@
+version: '3.8'
+
+networks:
+  bind9:
+    name: bind9
+    driver_opts:
+      com.docker.network.bridge.name: cni1
+    ipam:
+      config:
+        - subnet: 10.2.1.0/24
+
+services:
+  bind9:
+    image: ghcr.io/luotianyi-dev/bind9
+    container_name: bind9
+    restart: always
+    networks:
+      bind9:
+        ipv4_address: 10.2.1.2
+    ports:
+      - 53:53/udp
+      - 53:53/tcp
+    extra_hosts:
+      - docker-host:10.2.1.1
+      - dns.luotianyi.dev:10.1.0.1
+    environment:
+      - UPSTREAM_API_URL=https://dns.luotianyi.dev/api/v1/servers/localhost/zones
+      - UPSTREAM_API_KEY=${UPSTREAM_API_KEY}
+      - NAMED_BANNER_TEXT=luo tianyi dns server
+      - NAMED_CLUSTER_CIDR=10.1.0.0/24
+      - NAMED_UPSTREAM_IP=10.1.0.1
+      - ZONE_UPDATE_INTERVAL_SECONDS=45
+    deploy:
+      resources:
+        limits:
+          memory: 512M

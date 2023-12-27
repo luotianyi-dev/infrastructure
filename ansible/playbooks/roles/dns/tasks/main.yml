@@ -1,0 +1,13 @@
+- name: Allow DNS Service
+  ufw:
+    rule: allow
+    port: 53
+    state: enabled
+    comment: dns
+- name: Allow DNS Service (Forward)
+  ufw:
+    rule: allow
+    port: 53
+    route: true
+    state: enabled
+    comment: dns

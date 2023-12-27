@@ -1,0 +1,53 @@
+version: '3.8'
+
+networks:
+  powerdns:
+    name: powerdns
+    driver_opts:
+      com.docker.network.bridge.name: cni1
+    ipam:
+      config:
+        - subnet: 10.2.1.0/24
+
+services:
+  powerdns:
+    image: ghcr.io/luotianyi-dev/powerdns
+    container_name: powerdns
+    restart: always
+    networks:
+      powerdns:
+        ipv4_address: 10.2.1.2
+    ports:
+      - 53:53/udp
+      - 53:53/tcp
+    extra_hosts:
+      - docker-host:10.2.1.1
+    environment:
+      - POWERDNS_API_KEY=${POWERDNS_API_KEY}
+      - MYSQL_PASSWORD=${POWERDNS_MYSQL_PASSWORD}
+    volumes:
+      - ./conf/powerdns:/conf
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  powerdns-admin:
+    image: powerdnsadmin/pda-legacy@sha256:fdb6f78cf437000314694b76c87e26f0aed00b50237dfadf4ef444f4edcd4510
+    container_name: powerdns-admin
+    restart: always
+    networks:
+      powerdns:
+        ipv4_address: 10.2.1.3
+    extra_hosts:
+      - docker-host:10.2.1.1
+    environment:
+      - SECRET_KEY=${POWERDNS_ADMIN_SECRET_KEY}
+      - SQLALCHEMY_DATABASE_URI=mysql://powerdns_admin:${POWERDNS_ADMIN_MYSQL_PASSWORD}@docker-host/powerdns_admin
+      - GUNICORN_TIMEOUT=60
+      - GUNICORN_WORKERS=4
+      - CAPTCHA_ENABLE=false
+    deploy:
+      resources:
+        limits:
+          memory: 640M

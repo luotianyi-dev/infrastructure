@@ -46,3 +46,10 @@ ansible-playbook playbooks/setup_web.yml
 cd ansible
 ansible-playbook playbooks/setup_ns.yml
 ```
+
+**配置所有服务器的 Wireguard 互联**
+
+```bash
+cd ansible
+ansible-playbook playbooks/wireguard.yml
+```

@@ -1,4 +1,5 @@
 - hosts: web
+  gather_facts: false
   vars:
     server_domain: luotianyi.dev
     ssl_certificate_path: "/etc/ssl/private/{{ server_domain }}"

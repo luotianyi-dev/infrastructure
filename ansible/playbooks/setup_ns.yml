@@ -1,7 +1,5 @@
 - hosts: ns
-  vars:
-    server_domain: luotianyi.dev
-    ssl_certificate_path: "/etc/ssl/private/{{ server_domain }}"
+  gather_facts: false
   roles:
     - role: base
       vars:

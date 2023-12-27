@@ -1,0 +1,17 @@
+#!/bin/bash
+journalctl --rotate
+journalctl --vacuum-time=1s
+
+if [[ -d /var/log/nginx ]]; then
+    rm -rf /var/log/nginx/*
+    systemctl force-reload nginx
+fi
+
+rm -rf /var/log/auth.log* /var/log/ufw.log* /var/log/dmesg*
+> /var/log/auth.log
+> /var/log/ufw.log
+> /var/log/dmesg
+> /var/log/faillog
+
+rm -rf ~/.bash_history
+history -c

@@ -1,0 +1,13 @@
+- name: Setup docker @ Systemd Fix
+  copy:
+    src: files/systemd/docker.service.d/
+    dest: /etc/systemd/system/docker.service.d/
+- name: Setup docker @ Configure
+  copy:
+    src: files/docker/
+    dest: /etc/docker/
+- name: Setup docker @ Enable Systemd Service
+  systemd:
+    name: docker
+    enabled: yes
+    state: started

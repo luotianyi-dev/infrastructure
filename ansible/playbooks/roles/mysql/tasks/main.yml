@@ -1,0 +1,54 @@
+- name: Install Packages
+  community.general.pacman:
+    update_cache: true
+    name:
+      - mariadb
+- name: Install Scripts
+  copy:
+    src: files/exec/
+    dest: /usr/local/bin/
+    mode: '0755'
+- name: Adjust Configuration
+  copy:
+    src: files/mysql/
+    dest: /etc/my.cnf.d/
+    mode: '0644'
+- name: Create Subvolume
+  community.general.btrfs_subvolume:
+    name: "@var/lib/mysql"
+    filesystem_label: os-root
+- name: Set NoCOW for /var/lib/mysql
+  file:
+    path: /var/lib/mysql
+    state: directory
+    attributes: +C
+    owner: mysql
+    group: mysql
+- name: Check MySQL Installation
+  find:
+    paths: /var/lib/mysql/
+  register: filesFound
+- name: Install Database
+  shell: mariadb-install-db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+  when: filesFound.matched == 0
+- name: Start MySQL
+  service:
+    name: mariadb
+    state: started
+    enabled: true
+- name: Remove Test Database
+  community.mysql.mysql_db:
+    name: test
+    state: absent
+    login_unix_socket: /run/mysqld/mysqld.sock
+- name: Remove Anonymous User
+  community.mysql.mysql_query:
+    query:
+      - DELETE FROM mysql.user WHERE User = ''
+      - DELETE FROM mysql.user WHERE User = 'PUBLIC'
+      - FLUSH PRIVILEGES
+    login_unix_socket: /run/mysqld/mysqld.sock
+- name: Restart MySQL
+  service:
+    name: mariadb
+    state: restarted

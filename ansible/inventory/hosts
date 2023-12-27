@@ -1,0 +1,6 @@
+[web]
+haru          network_id=1
+
+[ns]
+monologue     network_id=2
+starlight     network_id=3

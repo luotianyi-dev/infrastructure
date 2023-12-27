@@ -1,0 +1,31 @@
+- name: Certificate Bootstrap @ Create Directory
+  file:
+    state: directory
+    path: "{{ ssl_certificate_path }}"
+- name: Certificate Bootstrap @ Private Key
+  community.crypto.openssl_privatekey:
+    type: ECC
+    curve: prime256v1
+    path: "{{ ssl_certificate_path }}/key.pem"
+    mode: '0600'
+- name: Certificate Bootstrap @ CSR
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: /etc/ssl/private/luotianyi.dev/key.pem
+    common_name: luotianyi.dev
+    subject_alt_name:
+      - 'luotianyi.dev'
+      - '*.luotianyi.dev'
+  register: csr
+- name: Certificate Bootstrap @ Certificate
+  community.crypto.x509_certificate:
+    path: "{{ ssl_certificate_path }}/cert.pem"
+    csr_content: "{{ csr.csr }}"
+    privatekey_path: "{{ ssl_certificate_path }}/key.pem"
+    provider: selfsigned
+- name: Certificate Bootstrap @ Finishing
+  copy:
+    src: "{{ ssl_certificate_path }}/cert.pem"
+    dest: "{{ ssl_certificate_path }}/{{ item }}"
+  loop:
+    - fullchain.pem
+    - ca.pem

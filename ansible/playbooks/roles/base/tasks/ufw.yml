@@ -1,0 +1,30 @@
+- name: ufw @ Fix for Docker
+  copy:
+    src: files/ufw/after.rules
+    dest: /etc/ufw/
+    mode: '0644'
+- name: ufw @ Allow SSH and Enable
+  community.general.ufw:
+    rule: allow
+    port: ssh
+    proto: tcp
+    state: enabled
+    comment: ssh
+- name: ufw @ Allow Internal Access
+  community.general.ufw:
+    state: enabled
+    rule: allow
+    from: "{{ item.from }}"
+    proto: any
+    route: "{{ item.route }}"
+    insert: 1
+  with_items:
+    - { from: 10.2.0.0/16, route: true }
+    - { from: 10.1.0.0/16, route: true }
+    - { from: 10.2.0.0/16, route: false }
+    - { from: 10.1.0.0/16, route: false }
+- name: ufw @ Start Systemd Service
+  service:
+    name: ufw
+    state: started
+    enabled: true

@@ -1,0 +1,3 @@
+#!/bin/sh
+mariadb -e "select user,host from mysql.user;"
+mariadb -e "flush privileges;"

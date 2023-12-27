@@ -1,0 +1,20 @@
+- name: Install Packages
+  community.general.pacman:
+    update_cache: true
+    name:
+      - docker
+      - docker-compose
+      - docker-buildx
+- name: Fix for Systemd
+  copy:
+    src: files/systemd/docker.service.d/
+    dest: /etc/systemd/system/docker.service.d/
+- name: Configure
+  copy:
+    src: files/daemon.json
+    dest: /etc/docker/
+- name: Enable and Start Docker Daemon
+  systemd:
+    name: docker
+    state: started
+    enabled: yes

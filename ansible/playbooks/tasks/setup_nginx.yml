@@ -1,0 +1,30 @@
+- name: Setup nginx @ Install Packages
+  community.general.pacman:
+    name:
+      - nginx
+- name: Setup nginx @ Copy Configurations
+  copy:
+    src: files/nginx/
+    dest: /etc/nginx/
+    mode: '0644'
+- name: Setup nginx @ Create Directorys
+  file:
+    state: "{{ item.state | default('directory') }}"
+    src: "{{ item.src | default(omit) }}"
+    path: "{{ item.path }}"
+  with_items:
+    - path: /etc/nginx/sites-available
+    - path: /etc/nginx/sites-enabled
+    - path: /srv/web
+    - path: /srv/http
+      state: absent
+    - path: /srv/ftp
+      state: absent
+    - path: /etc/nginx/sites-enabled/default.conf
+      src: /etc/nginx/sites-available/default.conf
+      state: link
+- name: Setup nginx @ Systemd
+  systemd_service:
+    enabled: true
+    state: started
+    name: nginx

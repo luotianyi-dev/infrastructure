@@ -1,0 +1,23 @@
+- name: Setup acme.sh @ Install Packages
+  community.general.pacman:
+    name:
+      - acme.sh
+- name: Setup acme.sh @ Setup Certificate Renew Timer
+  copy:
+    src: files/systemd/{{ item }}
+    dest: /etc/systemd/system/{{ item }}
+    mode: '0644'
+  loop:
+    - acme-renew-certificate.timer
+    - acme-renew-certificate.service
+- name: Setup acme.sh @ Start Certificate Renew Service
+  systemd_service:
+    daemon_reload: true
+    enabled: true
+    state: started
+    name: acme-renew-certificate
+- name: Setup acme.sh @ Enable Certificate Renew Timer
+  systemd_service:
+    enabled: true
+    state: started
+    name: acme-renew-certificate.timer

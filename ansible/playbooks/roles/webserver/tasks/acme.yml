@@ -1,0 +1,19 @@
+- name: acme @ Setup Certificate Renew Timer
+  copy:
+    src: files/systemd/{{ item }}
+    dest: /etc/systemd/system/{{ item }}
+    mode: '0644'
+  loop:
+    - acme-renew-certificate.timer
+    - acme-renew-certificate.service
+- name: acme @ Start Certificate Renew Service
+  systemd_service:
+    daemon_reload: true
+    enabled: true
+    state: started
+    name: acme-renew-certificate
+- name: acme @ Enable Certificate Renew Timer
+  systemd_service:
+    enabled: true
+    state: started
+    name: acme-renew-certificate.timer

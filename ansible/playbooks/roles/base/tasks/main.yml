@@ -1,0 +1,55 @@
+# - name: Install Packages
+#   community.general.pacman:
+#     update_cache: true
+#     name:
+#       - git
+#       - zip
+#       - unzip
+#       - bash-completion
+#       - vim
+#       - sudo
+#       - curl
+#       - wget
+#       - tree
+#       - tmux
+#       - iftop
+#       - iotop
+#       - btop
+#       - which
+#       - dnsutils
+#       - neofetch
+#       - python3
+#       - python-pipx
+#       - run-parts
+#       - ufw
+# - name: Install Scripts
+#   copy:
+#     src: files/exec/
+#     dest: /usr/local/bin/
+#     mode: '0755'
+# - name: Install Pipx Packages
+#   community.general.pipx:
+#     name: "{{ item }}"
+#     executable: "{{ pipx_path }}"
+#   loop:
+#     - pdm
+#     - ansible-core
+# - name: Install Ansible Dependencies
+#   community.general.pipx:
+#     name: ansible-core
+#     executable: "{{ pipx_path }}"
+#     state: inject
+#     inject_packages:
+#       - ansible
+#       - requests
+#       - docker
+#       - PyMySQL
+# - name: Install Ansible Galaxy Collections
+#   community.general.ansible_galaxy_install:
+#     type: collection
+#     name: "{{ item }}"
+#   loop:
+#     - community.general
+#     - community.docker
+#     - community.mysql
+- import_tasks: tasks/ufw.yml

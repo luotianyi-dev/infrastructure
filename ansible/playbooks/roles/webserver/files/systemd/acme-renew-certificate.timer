@@ -1,0 +1,9 @@
+[Unit]
+Description=Renew certificates with acme.sh
+
+[Timer]
+OnCalendar=*-*-* 19:07:12
+Persistent=true
+
+[Install]
+WantedBy=timers.target

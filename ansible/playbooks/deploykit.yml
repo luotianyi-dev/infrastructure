@@ -2,37 +2,40 @@
   become: true
   vars:
     api_domain: deployapi.webservice.luotianyi.dev
+    systemd_units:
+      - name: deploykit-reload-nginx.path
+      - name: deploykit-reload-nginx.service
     static_websites:
-      - project: blog
-        domain: luotianyi.dev
-        san: blog.luotianyi.dev
-      - project: wiki
-        domain: luotianyi.dev
-        san: wiki.luotianyi.dev
+      - project: vcportal
+        domain: vc123.xyz
+        san: vc123.xyz www.vc123.xyz
+      - project: yayingongyu
+        domain: xn--3bt625flzps8a.com
+        san: xn--3bt625flzps8a.com www.xn--3bt625flzps8a.com
 
   tasks:
-    # - name: Install DeployKit API ACME Certificates
-    #   command: "acme.sh-install-cert-nginx {{ api_domain }}"
-    # - name: Deploy DeployKit API NGINX Configuration
-    #   vars:
-    #     nginx_tls_domain: "{{ api_domain }}"
-    #     nginx_server_name: "{{ api_domain }}"
-    #     nginx_logger_name: deploykit-api
-    #     nginx_upstream: http://10.2.2.2:8000
-    #   template:
-    #     src: templates/nginx/reverse-proxy.conf.j2
-    #     dest: /etc/nginx/sites-available/deploykit-api.conf
-    #     owner: root
-    #     group: root
-    #     mode: '0644'
-    # - name: Enable DeployKit API NGINX Configuration
-    #   file:
-    #     src: /etc/nginx/sites-available/deploykit-api.conf
-    #     dest: /etc/nginx/sites-enabled/deploykit-api.conf
-    #     state: link
-    # - name: Install DeployKit Static Websites ACME Certificates
-    #   command: "acme.sh-install-cert-nginx {{ item.domain }}"
-    #   with_items: "{{ static_websites }}"
+    - name: Install DeployKit API ACME Certificates
+      command: "acme.sh-install-cert-nginx {{ api_domain }}"
+    - name: Deploy DeployKit API NGINX Configuration
+      vars:
+        nginx_tls_domain: "{{ api_domain }}"
+        nginx_server_name: "{{ api_domain }}"
+        nginx_logger_name: deploykit-api
+        nginx_upstream: http://10.2.2.2:8000
+      template:
+        src: templates/nginx/reverse-proxy.conf.j2
+        dest: /etc/nginx/sites-available/deploykit-api.conf
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Enable DeployKit API NGINX Configuration
+      file:
+        src: /etc/nginx/sites-available/deploykit-api.conf
+        dest: /etc/nginx/sites-enabled/deploykit-api.conf
+        state: link
+    - name: Install DeployKit Static Websites ACME Certificates
+      command: "acme.sh-install-cert-nginx {{ item.domain }}"
+      with_items: "{{ static_websites }}"
     - name: Deploy DeployKit Static Websites NGINX Configuration
       vars:
         deploykit_project: "{{ item.project }}"
@@ -51,3 +54,25 @@
         dest: "/etc/nginx/sites-enabled/deploykit-static-{{ item.project }}.conf"
         state: link
       with_items: "{{ static_websites }}"
+    - name: Reload NGINX
+      service:
+        name: nginx
+        state: reloaded
+    - name: Install DeployKit API Systemd Service
+      template:
+        src: templates/nginx/{{ item.name }}
+        dest: /etc/systemd/system/{{ item.name }}
+        owner: root
+        group: root
+        mode: '0644'
+      with_items: "{{ systemd_units }}"
+    - name: Enable DeployKit API Systemd Service
+      systemd:
+        name: "{{ item.name }}"
+        enabled: yes
+      with_items: "{{ systemd_units }}"
+    - name: Start DeployKit API Systemd Service
+      systemd:
+        name: "{{ item.name }}"
+        state: started
+      with_items: "{{ systemd_units }}"

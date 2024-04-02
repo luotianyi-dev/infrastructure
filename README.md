@@ -33,7 +33,7 @@
 
 ### 服务器初始化部署
 
-**web 服务器**
+**Web 服务器**
 
 ```bash
 cd ansible
@@ -52,4 +52,11 @@ ansible-playbook playbooks/setup_ns.yml
 ```bash
 cd ansible
 ansible-playbook playbooks/wireguard.yml
+```
+
+**配置 Web 服务器的 DeployKit 静态网站部署**
+在执行此步骤前，请确保您已经使用 acme.sh 完成了证书的申请。
+```bash
+cd ansible
+ansible-playbook playbooks/deploykit.yml
 ```

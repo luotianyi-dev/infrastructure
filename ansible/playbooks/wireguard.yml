@@ -2,10 +2,6 @@
   become: true
 
   tasks:
-    # - debug:
-    #     msg: "{{ hostvars[item]['ansible_env']['SERVER_PUBLIC_IP'] }}"
-    #   with_items: "{{ groups['all'] }}"
-    #   when: item != inventory_hostname
     - name: Install WireGuard
       community.general.pacman:
         update_cache: true

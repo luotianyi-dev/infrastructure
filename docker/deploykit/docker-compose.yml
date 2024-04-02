@@ -1,0 +1,31 @@
+version: '3.8'
+
+networks:
+  deploykit:
+    name: deploykit
+    driver_opts:
+      com.docker.network.bridge.name: cni2
+    ipam:
+      config:
+        - subnet: 10.2.2.0/24
+
+services:
+  deploykit:
+    image: ghcr.io/luotianyi-dev/deploykit:1.0.0
+    container_name: deploykit-server
+    restart: always
+    networks:
+      deploykit:
+        ipv4_address: 10.2.2.2
+    extra_hosts:
+      - docker-host:10.2.2.1
+    environment:
+      - API_KEY=${API_KEY}
+      - APP_PATH=/srv/web/deploykit
+      - WEB_CONCURRENCY=4
+    volumes:
+      - /srv/web/deploykit:/srv/web/deploykit
+    deploy:
+      resources:
+        limits:
+          memory: 512M

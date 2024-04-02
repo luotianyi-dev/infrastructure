@@ -1,0 +1,19 @@
+server {
+	listen 443      ssl http2;
+	listen [::]:443 ssl http2;
+	server_name     {{ deploykit_san }};
+	include         ssl_params;
+	include         ocsp_params;
+	include         hsts_params;
+	root            /srv/web/deploykit/{{ deploykit_project }}/current/public;
+	error_page 404  /404.html;
+
+	index                    index.html;
+	ssl_certificate          /etc/ssl/private/{{ deploykit_domain }}/fullchain.pem;
+	ssl_certificate_key      /etc/ssl/private/{{ deploykit_domain }}/key.pem;
+	ssl_trusted_certificate  /etc/ssl/private/{{ deploykit_domain }}/ca.pem;
+	access_log               /var/log/nginx/deploykit-static-{{ deploykit_project }}-access.log main buffer=512k flush=1m;
+	error_log                /var/log/nginx/deploykit-static-{{ deploykit_project }}-error.log;
+
+	include                  /srv/web/deploykit/{{ deploykit_project }}/current/*.conf;
+}

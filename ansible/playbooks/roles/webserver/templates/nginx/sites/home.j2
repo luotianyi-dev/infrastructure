@@ -1,0 +1,33 @@
+{% extends "_layout.j2" %}
+{% block prelude %}
+map $geoip2_country_code $site_{{ name.replace('-', '_') }}__cdn_host {
+	'CN'    '{{ dist_url_mainland }}';
+	'XX'    '{{ dist_url_mainland }}';
+	default '{{ dist_url_overseas }}';
+}
+
+{% endblock %}{% block location %}
+
+	add_header      X-CDN-Schedule-Country
+	                $geoip2_country_code;
+	sub_filter      {{ dist_url_accelerate }}
+	                $site_{{ name.replace('-', '_') }}__cdn_host;
+	sub_filter      {{ dist_url_upstream }}
+	                $site_{{ name.replace('-', '_') }}__cdn_host;
+	sub_filter_once off;
+
+	if ($host != "luotianyi.dev") {
+		return      307  https://luotianyi.dev$request_uri;
+	}
+
+	location / {
+		error_page  404  /404.html;
+		try_files   $uri $uri.html $uri/ =404;
+	}
+
+	location /apps {
+		alias       {{ apps }}/apps;
+		error_page  404  /apps/404.html;
+		try_files   $uri $uri.html $uri/ =404;
+	}
+{% endblock %}

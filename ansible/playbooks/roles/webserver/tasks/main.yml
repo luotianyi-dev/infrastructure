@@ -1,18 +1,67 @@
-- name: Install Packages
-  community.general.pacman:
-    name:
-      - acme.sh
-      - nginx
-- name: Install Scripts
-  copy:
-    src: files/exec/
-    dest: /usr/local/bin/
-    mode: '0755'
-- import_tasks: tasks/acme.yml
 - name: Check Certificate Existence
   stat:
     path: "{{ ssl_certificate_path }}/fullchain.pem"
   register: ssl_certificate
+  when: ssl_certificate_path is defined
 - import_tasks: tasks/bootstrap_certificate.yml
-  when: ssl_certificate.stat.exists == false
-- import_tasks: tasks/nginx.yml
+  when: (ssl_certificate_path is defined) and (ssl_certificate.stat.exists == false)
+
+
+
+- name: Install Packages
+  community.general.pacman:
+    name:
+      - nginx
+      - nginx-mod-brotli
+      - nginx-mod-geoip2
+- name: Copy Nginx Configurations
+  copy:
+    src: files/conf/nginx/
+    dest: /etc/nginx/
+    mode: '0644'
+- name: Copy SSL Confgurations
+  copy:
+    src: files/conf/ssl/ffdhe2048.pem
+    dest: /etc/ssl/ffdhe2048.pem
+    mode: '0644'
+- name: nginx @ Create Directorys
+  file:
+    state: "{{ item.state | default('directory') }}"
+    src: "{{ item.src | default(omit) }}"
+    path: "{{ item.path }}"
+  with_items:
+    - path: /etc/nginx/sites-available
+    - path: /etc/nginx/sites-enabled
+    - path: /srv/web
+    - path: /srv/http
+      state: absent
+    - path: /srv/ftp
+      state: absent
+
+
+
+- import_tasks: tasks/web.yml
+  vars:
+    dist_url_accelerate: https://cos.accelerate.myqcloud.com/luotianyi-dev-1251131545
+    dist_url_upstream:   https://luotianyi-dev-1251131545.cos.accelerate.myqcloud.com
+    dist_url_mainland:   https://luotianyi-dev-1251131545.file.myqcloud.com
+    dist_url_overseas:   https://oversea-dist.luotianyi.dev
+- import_tasks: tasks/web_deploykit.yml
+
+
+
+- name: nginx @ Systemd
+  systemd_service:
+    enabled: true
+    state: restarted
+    name: nginx
+- name: nginx @ Allow UFW Access
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+    state: enabled
+    comment: "{{ item }}"
+  loop:
+    - http
+    - https

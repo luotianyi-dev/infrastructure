@@ -9,6 +9,9 @@
         ansible_python_interpreter: /usr/bin/python3
         pipx_path: /usr/local/bin/pipx
     - role: docker
+    - role: acme
     - role: webserver
+      vars:
+        ssl_certificate_path: /etc/ssl/private/luotianyi.dev
     - role: portainer
     - role: mysql

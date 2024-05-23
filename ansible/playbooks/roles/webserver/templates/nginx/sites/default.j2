@@ -1,0 +1,17 @@
+{% extends "_layout.j2" %}
+{% block prelude %}
+server {
+	listen 80      default_server;
+	listen [::]:80 default_server;
+
+	location / {
+		return 301 https://$host$request_uri;
+	}
+}
+
+{% endblock %}{% block location %}
+
+	location / {
+		return 403;
+	}
+{% endblock %}

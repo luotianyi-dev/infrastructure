@@ -1,0 +1,96 @@
+- name: <default>
+  template:
+    src: templates/nginx/sites/default.j2
+    dest: /etc/nginx/sites-available/default.conf
+  vars:
+    name: default
+    server_name: _
+    server_name_ssl: luotianyi.dev
+    default_server: true
+
+- name: <type:static>
+  template:
+    src: templates/nginx/sites/_static.j2
+    dest: /etc/nginx/sites-available/{{ item.name }}.conf
+  vars:
+    name: "{{ item.name }}"
+    hsts: true
+    root: /srv/web/{{ item.name }}
+    server_name:  "{{ item.name }}.luotianyi.dev"
+    server_name_ssl: luotianyi.dev
+  with_items:
+    - name: schema
+
+- name: <type:proxy>
+  template:
+    src: templates/nginx/sites/_proxy.j2
+    dest: /etc/nginx/sites-available/{{ item.name }}.conf
+  vars:
+    name: "{{ item.name }}"
+    hsts: true
+    upstream: "{{ item.upstream }}"
+    server_name: "{{ item.name }}.luotianyi.dev"
+    server_name_ssl: luotianyi.dev
+  with_items:
+    - name: dns
+      upstream: http://10.2.1.3:80
+    - name: docker
+      upstream: https://127.0.0.1:9443
+
+- name: oversea-dist
+  template:
+    src: templates/nginx/sites/oversea-dist.j2
+    dest: /etc/nginx/sites-available/oversea-dist.conf
+  vars:
+    name: oversea-dist
+    hsts: true
+    upstream: "{{ dist_url_upstream }}"
+    server_name: oversea-dist.luotianyi.dev
+    server_name_ssl: luotianyi.dev
+
+- name: home
+  template:
+    src: templates/nginx/sites/home.j2
+    dest: /etc/nginx/sites-available/home.conf
+  vars:
+    name: home
+    hsts: true
+    root: /srv/web/home/dist
+    apps: /srv/web/home/apps
+    server_name: "luotianyi.dev www.luotianyi.dev"
+    server_name_ssl: luotianyi.dev
+
+
+- name: Create Home Distribution
+  file:
+    dest: /srv/web/home
+    state: directory
+- name: Create Symlinks for Home Distribution
+  file:
+    src:  /srv/web/deploykit/{{ item.name }}/current/dist
+    dest: /srv/web/home/{{ item.path }}
+    state: link
+  with_items:
+    # - name: home
+    #   path: dist
+    - name: apps
+      path: apps
+
+- name: Create Cache Directorys
+  file:
+    state: directory
+    path:  /var/cache/nginx/{{ item }}
+  with_items:
+    - oversea-dist
+
+- name: Enable Sites
+  file:
+    src:  /etc/nginx/sites-available/{{ item }}.conf
+    dest: /etc/nginx/sites-enabled/{{ item }}.conf
+    state: link
+  with_items:
+    - default
+    - home
+    - oversea-dist
+    - dns
+    - docker

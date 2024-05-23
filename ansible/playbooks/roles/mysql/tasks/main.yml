@@ -10,7 +10,7 @@
     mode: '0755'
 - name: Adjust Configuration
   copy:
-    src: files/mysql/
+    src: files/conf/
     dest: /etc/my.cnf.d/
     mode: '0644'
 - name: Create Subvolume

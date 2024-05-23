@@ -1,0 +1,39 @@
+- name: DeployKit - API
+  template:
+    src: templates/nginx/sites/_proxy.j2
+    dest: /etc/nginx/sites-available/deploykit-api.conf
+  vars:
+    name: deploykit-api
+    hsts: true
+    server_name:     deployapi.webservice.luotianyi.dev
+    server_name_ssl: deployapi.webservice.luotianyi.dev
+    upstream: http://10.2.2.2:8000
+
+
+- name: DeployKit - Static
+  template:
+    src: templates/nginx/sites/_deploykit.j2
+    dest: /etc/nginx/sites-available/deploykit-static-{{ item.name }}.conf
+  vars:
+    name: deploykit-static-{{ item.name }}
+    hsts: true
+    root: /srv/web/deploykit/{{ item.name }}/current/public
+    server_name:     "{{ item.domain }} www.{{ item.domain }}"
+    server_name_ssl: "{{ item.domain }}"
+    deploykit_name:  "{{ item.name }}"
+  with_items:
+    - name: vcportal
+      domain: vc123.xyz
+    - name: yayingongyu
+      domain: xn--3bt625flzps8a.com
+
+
+- name: Enable Sites
+  file:
+    src:  /etc/nginx/sites-available/deploykit-{{ item }}.conf
+    dest: /etc/nginx/sites-enabled/deploykit-{{ item }}.conf
+    state: link
+  with_items:
+    - api
+    - static-vcportal
+    - static-yayingongyu

@@ -1,6 +1,6 @@
 - name: ufw @ Fix for Docker
   copy:
-    src: files/ufw/after.rules
+    src: files/conf/ufw/after.rules
     dest: /etc/ufw/
     mode: '0644'
 - name: ufw @ Allow SSH and Enable

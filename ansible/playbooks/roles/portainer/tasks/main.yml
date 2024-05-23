@@ -7,22 +7,3 @@
     name: portainer
 - name: Start Container
   shell: /usr/local/bin/portainer start
-- name: nginx @ Setup
-  template:
-    src: templates/nginx/reverse-proxy.conf.j2
-    dest: /etc/nginx/sites-available/docker.conf
-    mode: '0644'
-  vars:
-    nginx_server_name: docker.{{ server_domain }}
-    nginx_tls_domain: "{{ server_domain }}"
-    nginx_logger_name: docker
-    nginx_upstream: https://127.0.0.1:9443
-- name: nginx @ Activate
-  file:
-    src: /etc/nginx/sites-available/docker.conf
-    dest: /etc/nginx/sites-enabled/docker.conf
-    state: link
-- name: nginx @ Restart
-  systemd_service:
-    name: nginx
-    state: restarted

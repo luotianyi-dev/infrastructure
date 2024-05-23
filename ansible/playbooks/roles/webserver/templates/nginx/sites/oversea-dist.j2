@@ -1,0 +1,18 @@
+{% extends "_proxy.j2" %}
+{% block prelude %}
+proxy_cache_path /var/cache/nginx/{{ name }} levels=1:2 keys_zone=cache_{{ name.replace('-', '_') }}:64m max_size=256m;
+
+{% endblock %}{% block proxy_inject %}
+		sub_filter              {{ dist_url_accelerate.replace('https://', '') }} {{ dist_url_overseas.replace('https://', '') }};
+		sub_filter              {{ dist_url_upstream.replace('https://', '')   }} {{ dist_url_overseas.replace('https://', '') }};
+		sub_filter_once         off;
+		sub_filter_types        text/css text/javascript application/javascript application/x-javascript;
+
+		proxy_set_header        Host  {{ dist_url_upstream.replace('https://', '') }};
+		proxy_cache             cache_{{ name.replace('-', '_') }};
+		proxy_cache_methods     GET;
+		proxy_cache_revalidate  on;
+		proxy_cache_valid       200 90d;
+		proxy_cache_valid any   1s;
+		proxy_cache_use_stale   error timeout invalid_header http_500 http_502 http_503 http_504;
+{% endblock %}

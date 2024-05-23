@@ -16,6 +16,7 @@
    ansible-galaxy collection install community.general
    ansible-galaxy collection install community.docker
    ansible-galaxy collection install community.mysql
+   ansible-galaxy collection install community.crypto
    ```
  - 您已在 `~/.ssh/config` 中配置了相关 hostname，并确保可以通过 SSH 连接到服务器，并具有 root 权限。配置示例如下：
    ```

@@ -1,0 +1,22 @@
+{% block prelude %}{% endblock %}
+server {
+	listen 443      ssl{% if default_server is defined %} default_server{% endif %};
+	listen [::]:443 ssl{% if default_server is defined %} default_server{% endif %};
+	server_name     {{ server_name }};
+{% if root  is defined %}
+	root            {{ root }};
+{% endif %}{% if index is defined %}
+	index           {{ index }};
+{% endif %}{% if hsts  is defined %}
+	include         hsts_params;
+{% endif %}
+	include         ocsp_params;
+	include         ssl_params;
+
+	ssl_certificate          /etc/ssl/private/{{ server_name_ssl }}/fullchain.pem;
+	ssl_certificate_key      /etc/ssl/private/{{ server_name_ssl }}/key.pem;
+	ssl_trusted_certificate  /etc/ssl/private/{{ server_name_ssl }}/ca.pem;
+	access_log               /var/log/nginx/{{ name }}-access.log main buffer=512k flush=1m;
+	error_log                /var/log/nginx/{{ name }}-error.log;
+{% block location %}{% endblock %}
+}

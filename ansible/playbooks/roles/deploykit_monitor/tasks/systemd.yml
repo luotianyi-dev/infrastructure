@@ -1,0 +1,19 @@
+- name: Install DeployKit Monitor Systemd Service
+  template:
+    src: files/conf/systemd/{{ item }}
+    dest: /etc/systemd/system/{{ item }}
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Enable DeployKit API Systemd Service
+  systemd:
+    daemon_reload: yes
+    name: "{{ item }}"
+    enabled: yes
+
+- name: Start DeployKit API Systemd Service
+  systemd:
+    daemon_reload: yes
+    name: "{{ item }}"
+    state: started

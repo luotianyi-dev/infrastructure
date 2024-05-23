@@ -1,0 +1,9 @@
+[Unit] 
+Description=Reload Nginx when DeployKit receives new deployment
+
+[Path] 
+PathChanged=/srv/web/deploykit
+Unit=deploykit-reload-nginx.service
+
+[Install]
+WantedBy=multi-user.target

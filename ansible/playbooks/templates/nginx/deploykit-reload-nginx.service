@@ -1,8 +1,0 @@
-[Unit]
-Description=Reload Nginx when DeployKit receives new deployment
-After=network-online.target
-
-[Service]
-Type=oneshot
-ExecCondition=/usr/bin/nginx -t
-ExecStart=systemctl restart nginx

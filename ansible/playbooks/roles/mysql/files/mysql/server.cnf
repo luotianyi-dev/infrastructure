@@ -1,9 +1,0 @@
-[server]
-collation_server = utf8mb4_unicode_ci
-character_set_server = utf8mb4
-
-[mysqld]
-bind-address = 0.0.0.0
-skip-name-resolve
-thread_cache_size = 256
-innodb_log_file_size = 32M

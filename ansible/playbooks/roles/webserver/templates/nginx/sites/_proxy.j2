@@ -1,0 +1,10 @@
+{% extends "_layout.j2" %}
+{% block location %}
+
+	location / {
+		proxy_pass       {{ upstream }};
+		proxy_ssl_verify {{ 'on' if no_proxy_ssl_verify is defined else 'off' }};
+		include          proxy_params;
+{% block proxy_inject %}{% endblock %}
+	}
+{% endblock %}

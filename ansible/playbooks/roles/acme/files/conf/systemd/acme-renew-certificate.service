@@ -1,0 +1,7 @@
+[Unit]
+Description=A pure Unix shell script implementing ACME client protocol
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/acme.sh --cron

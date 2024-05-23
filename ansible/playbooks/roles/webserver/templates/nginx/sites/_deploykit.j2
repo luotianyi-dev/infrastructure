@@ -1,0 +1,5 @@
+{% extends "_layout.j2" %}
+{% block location %}
+	error_page  404          /404.html;
+	include                  /srv/web/deploykit/{{ deploykit_name }}/current/*.conf;
+{% endblock %}

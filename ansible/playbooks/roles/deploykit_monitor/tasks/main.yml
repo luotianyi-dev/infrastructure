@@ -1,0 +1,4 @@
+- include_tasks: tasks/systemd.yml
+  with_items:
+    - deploykit-reload-nginx.path
+    - deploykit-reload-nginx.service

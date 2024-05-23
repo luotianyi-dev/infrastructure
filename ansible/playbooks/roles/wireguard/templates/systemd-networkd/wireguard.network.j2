@@ -1,0 +1,10 @@
+[Match]
+Name=wg-peer{{ peer_network_id }}
+
+[Network]
+LinkLocalAddressing=no
+ConfigureWithoutCarrier=yes
+
+[Address]
+Address={{ host_private_cidr }}
+Peer={{ peer_private_cidr }}

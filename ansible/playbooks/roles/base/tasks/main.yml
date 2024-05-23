@@ -35,6 +35,8 @@
   loop:
     - pdm
     - ansible-core
+- name: Fix Pipx Path
+  shell: "/usr/local/lib/pipx/venvs/ansible-core/bin/python -m ensurepip"
 - name: Install Ansible Dependencies
   community.general.pipx:
     name: ansible-core

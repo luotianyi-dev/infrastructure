@@ -1,0 +1,27 @@
+version: '3.8'
+
+networks:
+  apps:
+    name: apps
+    driver_opts:
+      com.docker.network.bridge.name: cni3
+    ipam:
+      config:
+        - subnet: 10.2.3.0/24
+
+services:
+  api-server:
+    image: ghcr.io/luotianyi-dev/apps-api-server
+    container_name: apps-api-server
+    restart: always
+    networks:
+      apps:
+        ipv4_address: 10.2.3.2
+    extra_hosts:
+      - docker-host:10.2.3.1
+    environment:
+      - "ConnectionStrings:MySql=Server=docker-host;Port=3306;User=apps;Password=${APPS_API_SERVER_MYSQL_PASSWORD};Database=apps;"
+    deploy:
+      resources:
+        limits:
+          memory: 512M

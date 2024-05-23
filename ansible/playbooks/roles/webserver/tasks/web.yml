@@ -57,6 +57,7 @@
     hsts: true
     root: /srv/web/home/dist
     apps: /srv/web/home/apps
+    api_upstream: http://10.2.3.2:5000
     server_name: "luotianyi.dev www.luotianyi.dev"
     server_name_ssl: luotianyi.dev
 

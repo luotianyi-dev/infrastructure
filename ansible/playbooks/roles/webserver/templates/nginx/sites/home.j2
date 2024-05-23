@@ -30,4 +30,9 @@ map $geoip2_country_code $site_{{ name.replace('-', '_') }}__cdn_host {
 		error_page  404  /apps/404.html;
 		try_files   $uri $uri.html $uri/ =404;
 	}
+
+	location /apps/api {
+		proxy_pass {{ api_upstream }};
+		include    proxy_params;
+	}
 {% endblock %}
